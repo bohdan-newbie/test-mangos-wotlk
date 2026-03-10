@@ -22,6 +22,18 @@ jobs:
           submodules: recursive
           fetch-depth: 0
 
+      - name: Sync submodules hard
+        shell: pwsh
+        run: |
+          git submodule sync --recursive
+          git submodule update --init --recursive --force
+
+      - name: Show submodule status
+        shell: pwsh
+        run: |
+          git rev-parse HEAD
+          git submodule status --recursive
+
       - name: Create Build Environment
         shell: pwsh
         run: |
@@ -62,13 +74,28 @@ jobs:
         run: |
           cmake --build "${{ env.BUILD_DIR }}" --config ${{ env.BUILD_TYPE }}
 
+      - name: List build output
+        if: always()
+        shell: pwsh
+        run: |
+          if (Test-Path "${{ github.workspace }}/bin") {
+            Get-ChildItem "${{ github.workspace }}/bin" -Recurse | Select-Object FullName
+          }
+
       - name: Archive files
+        if: success()
         shell: pwsh
         run: |
           cd "${{ github.workspace }}/bin"
-          7z a -tzip snapshot.zip x64_Release
+          if (Test-Path "x64_Release") {
+            7z a -tzip snapshot.zip x64_Release
+          } else {
+            Write-Host "x64_Release folder not found"
+            exit 1
+          }
 
       - name: Archive this artifact
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: snapshot
