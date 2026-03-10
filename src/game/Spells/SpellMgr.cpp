@@ -3423,10 +3423,15 @@ DiminishingGroup GetDiminishingReturnsGroupForSpell(SpellEntry const* spellproto
                 return DIMINISHING_NONE;
             break;
         case SPELLFAMILY_MAGE:
-            // Dragon's Breath
-            if (spellproto->SpellIconID == 1548)
-                return DIMINISHING_DISORIENT;
-            break;
+    // Dragon's Breath
+    if (spellproto->SpellIconID == 1548)
+        return DIMINISHING_DISORIENT;
+
+    // Polymorph
+    if ((spellproto->SpellFamilyFlags & uint64(0x1000000)) && IsSpellHaveAura(spellproto, SPELL_AURA_MOD_CONFUSE))
+        return DIMINISHING_DISORIENT;
+
+    break;
         case SPELLFAMILY_ROGUE:
         {
             // Blind
