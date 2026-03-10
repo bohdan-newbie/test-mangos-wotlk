@@ -1,12 +1,14 @@
 name: Windows build
 
-on: [push]
+on:
+  push:
+  workflow_dispatch:
 
 env:
   BUILD_TYPE: Release
   REPO_DIR: ${{ github.workspace }}
   BUILD_DIR: ${{ github.workspace }}/bin/builddir
-  BOOST_VERSION: "1.73.0"
+  BOOST_VERSION: "1.78.0"
   BOOST_INSTALL_DIR: "${{ github.workspace }}/bin"
 
 jobs:
@@ -20,8 +22,6 @@ jobs:
       - name: Create Build Environment
         shell: pwsh
         run: |
-          "GITHUB_SHORT_REV=$(git rev-parse --short HEAD)" >> $env:GITHUB_ENV
-          "ARCHIVE_FILENAME=${{ github.event.repository.name }}-$(git rev-parse --short HEAD).zip" >> $env:GITHUB_ENV
           cmake -E make_directory "${{ env.BUILD_DIR }}"
 
       - name: Install boost
@@ -29,8 +29,8 @@ jobs:
         id: install-boost
         with:
           boost_version: ${{ env.BOOST_VERSION }}
-          version: legacy
-          toolset: msvc14.2
+          platform_version: 2022
+          toolset: msvc
           boost_install_dir: ${{ env.BOOST_INSTALL_DIR }}
 
       - name: Export BOOST_ROOT
@@ -52,13 +52,13 @@ jobs:
         shell: pwsh
         run: |
           cd bin
-          7z a -tzip "${{ env.ARCHIVE_FILENAME }}" x64_Release
+          7z a -tzip snapshot.zip x64_Release
 
       - name: Archive this artefact
         uses: actions/upload-artifact@v4
         with:
           name: snapshot
-          path: "bin/${{ env.ARCHIVE_FILENAME }}"
+          path: bin/snapshot.zip
 
   notify:
     name: Discord Notification
