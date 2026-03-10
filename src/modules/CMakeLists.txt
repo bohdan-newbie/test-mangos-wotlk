@@ -19,3 +19,6 @@
 
 
 # Include Player Bots if enabled
+if(BUILD_IKE3_BOTS)
+    add_subdirectory(Bots)
+endif()
