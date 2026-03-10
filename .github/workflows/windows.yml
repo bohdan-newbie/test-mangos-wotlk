@@ -19,7 +19,7 @@ jobs:
     
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           path: ${{env.REPO_DIR}}
 
@@ -32,7 +32,7 @@ jobs:
 
       # install dependencies
       - name: Cache Windows boost
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         id: cache-boost
         with:
           path: "${{env.BOOST_INSTALL_DIR}}/boost"
@@ -68,7 +68,7 @@ jobs:
           7z a -tzip ${{env.ARCHIVE_FILENAME}} x64_Release
 
       - name: Archive this artefact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: snapshot
           path: "bin/${{env.ARCHIVE_FILENAME}}"
